@@ -1,38 +1,66 @@
-# DataForgeML — ML Data Cleaning Studio
+<div align="center">
 
-Full-stack ML data cleaning application with a FastAPI backend and Vite + React frontend.
+# 🧹 ML Cleaning Studio
 
----
+**A powerful, browser-based data cleaning tool built for ML workflows**
 
-## Architecture
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20App-6366f1?style=for-the-badge&logo=vercel)](https://yashu-s.vercel.app/)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi)
+![React](https://img.shields.io/badge/React-Vite-61DAFB?style=for-the-badge&logo=react)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)
 
-```
-ml-cleaning-studio/
-├── backend/
-│   ├── app.py          # FastAPI app, session state, upload/download endpoints
-│   ├── cleaners.py     # All ML/statistical cleaning pipelines (scikit-learn, scipy)
-│   └── requirements.txt
-└── frontend/
-    ├── src/
-    │   ├── api.js      # Axios API client
-    │   ├── App.jsx     # Full UI — dropzone, stats, null-map, column config, clean/download
-    │   └── index.css   # Industrial dark theme (Space Mono + DM Sans)
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
-```
+Upload a CSV → clean it → export it. No notebooks. No code.
+
+</div>
 
 ---
 
-## Quick Start
+## ✨ Features
+
+| Category | Operations |
+|---|---|
+| **Missing Values** | Mean, Median, Mode imputation · KNN imputation · Iterative (MICE) imputation |
+| **Outlier Detection** | Z-Score · IQR · Isolation Forest |
+| **Encoding** | One-Hot · Label · Target Encoding |
+| **Scaling** | Standard (Z-score) · MinMax · Robust Scaler |
+| **Insights** | Per-column stats · Null % · Data types · Unique counts |
+
+- 📂 Upload any CSV file and get instant column-level statistics
+- ⚙️ Apply multiple cleaning operations in sequence
+- 📥 Export the cleaned dataset ready for model training
+- ⚡ Session-based — your data stays in memory during the session
+
+---
+
+## 🚀 Live Demo
+
+👉 **[https://yashu-s.vercel.app/](https://yashu-s.vercel.app/)**
+
+---
+
+## 🏗️ Tech Stack
+
+```
+Frontend  →  React + Vite + Tailwind CSS   (deployed on Vercel)
+Backend   →  FastAPI + Uvicorn             (deployed on Render)
+ML        →  scikit-learn · pandas · scipy · numpy
+```
+
+---
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
 
 ### Backend
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app:app --reload --port 8000
+uvicorn app:app --host 0.0.0.0 --port $PORT
+
 ```
 
 ### Frontend
@@ -40,51 +68,55 @@ uvicorn app:app --reload --port 8000
 ```bash
 cd frontend
 npm install
+```
+
+Create a `.env` file inside `frontend/`:
+
+```env
+VITE_API_URL=https://yashu-s.vercel.app/
+```
+
+Then run:
+
+```bash
 npm run dev
-# Opens at http://localhost:5173
+```
+
+App will be live at `https://yashu-s.vercel.app/`
+
+---
+
+## ☁️ Deployment
+
+| Service | Platform | Config |
+|---|---|---|
+| Frontend | Vercel | Root: `frontend` · Build: `npm run build` · Output: `dist` |
+| Backend | Render | Root: `backend` · Start: `uvicorn app:app --host 0.0.0.0 --port $PORT` |
+
+Set `VITE_API_URL` as an environment variable in Vercel pointing to your Render backend URL.
+
+---
+
+## 📁 Project Structure
+
+```
+ml-cleaning-studio/
+├── backend/
+│   ├── app.py           # FastAPI routes & session management
+│   ├── cleaners.py      # All ML cleaning logic
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   └── api.js       # Axios calls to backend
+│   ├── vite.config.js
+│   └── package.json
+└── runtime.txt          # Python 3.11.9 (for Render)
 ```
 
 ---
 
-## REST API
+<div align="center">
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/upload` | Upload CSV/Parquet → returns `session_id` + full column stats |
-| `GET`  | `/session/{id}/stats` | Fetch session stats |
-| `POST` | `/session/{id}/clean` | Apply cleaning config (global + per-column) |
-| `GET`  | `/session/{id}/download?fmt=csv\|parquet` | Download cleaned dataset |
-| `DELETE` | `/session/{id}` | Release session memory |
+Made by ME 😎· [Live App](https://yashu-s.vercel.app/)
 
-### Cleaning config payload (`POST /session/{id}/clean`)
-
-```json
-{
-  "global_config": { "method": "median", "params": {} },
-  "column_configs": {
-    "age":    { "method": "knn",              "params": { "n_neighbors": 5 } },
-    "income": { "method": "isolation_forest", "params": { "contamination": 0.05, "action": "remove" } },
-    "gender": { "method": "onehot",           "params": { "drop_first": false } }
-  }
-}
-```
-
----
-
-## Supported ML Methods
-
-| Category | Method key | Description |
-|----------|-----------|-------------|
-| Imputation | `iterative` | IterativeImputer (MICE / linear regression) |
-| Imputation | `knn` | KNNImputer |
-| Imputation | `median` | Column median (categorical → mode) |
-| Imputation | `mean` | Column mean |
-| Imputation | `mode` | Most-frequent value |
-| Outliers | `isolation_forest` | IsolationForest (remove or → NaN) |
-| Outliers | `zscore` | Z-score threshold filter |
-| Encoding | `onehot` | One-Hot Encoding |
-| Encoding | `label` | Label / ordinal encoding |
-| Encoding | `target` | Mean target encoding |
-| Scaling | `standard` | StandardScaler (z-norm) |
-| Scaling | `robust` | RobustScaler (IQR-based) |
-| Scaling | `minmax` | MinMaxScaler [0, 1] |
+</div>
